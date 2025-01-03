@@ -22,7 +22,7 @@ allprojects {
         maven { url "https://jitpack.io" }
     }
 
-    group = "com.github.fsbarata.kotlin"
+    group = "com.github.fsbarata.kotlin-numeric"
 }
 
 subprojects {
