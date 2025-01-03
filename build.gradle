@@ -27,6 +27,23 @@ allprojects {
 
 subprojects {
     afterEvaluate {
+        if (plugins.hasPlugin("maven-publish")) {
+            if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+                publishing.publications {
+                    maven(MavenPublication) {
+                        from(components.kotlin)
+                    }
+                }
+            }
+            if (plugins.hasPlugin("java")) {
+                publishing.publications {
+                    maven(MavenPublication) {
+                        from(components.java)
+                    }
+                }
+            }
+        }
+
         tasks.withType(KotlinCompile.class).configureEach {
             kotlinOptions {
                 jvmTarget = JavaVersion.VERSION_1_9.toString()
