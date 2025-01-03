@@ -29,14 +29,14 @@ subprojects {
     afterEvaluate {
         tasks.withType(KotlinCompile.class).configureEach {
             kotlinOptions {
-                jvmTarget = JavaVersion.VERSION_1_8.toString()
+                jvmTarget = JavaVersion.VERSION_1_9.toString()
             }
         }
 
         if (plugins.hasPlugin("java")) {
             java {
-                sourceCompatibility = JavaVersion.VERSION_1_8
-                targetCompatibility = JavaVersion.VERSION_1_8
+                sourceCompatibility = JavaVersion.VERSION_1_9
+                targetCompatibility = JavaVersion.VERSION_1_9
             }
         }
     }
