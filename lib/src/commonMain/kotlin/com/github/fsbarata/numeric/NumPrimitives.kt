@@ -1,3 +1,5 @@
+@file:Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+
 package com.github.fsbarata.numeric
 
 import com.github.fsbarata.numeric.ints.BigInt
@@ -7,7 +9,7 @@ import com.github.fsbarata.io.Serializable
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
-abstract class BaseIntNumScope: Integral.Scope<Int> {
+abstract class BaseIntNumScope: Integral.Scope<Int>, Bitwise.Scope<Int> {
 	override val ZERO: Int = 0
 	override val ONE: Int = 1
 
@@ -58,6 +60,15 @@ abstract class BaseIntNumScope: Integral.Scope<Int> {
 	override fun toInt128(a: Int): Int128 = Int128.fromInt(a)
 	override fun toInt128OrNull(a: Int): Int128 = toInt128(a)
 	override fun toBigInt(a: Int): BigInt = BigInt.fromInt(a)
+
+	override fun not(t: Int): Int = t.inv()
+	override infix fun Int.and(other: Int): Int = and(other)
+	override infix fun Int.or(other: Int): Int = or(other)
+	override infix fun Int.xor(other: Int): Int = xor(other)
+	override infix fun Int.shl(bitCount: Int): Int = shl(bitCount)
+	override infix fun Int.shr(bitCount: Int): Int = shr(bitCount)
+	override fun highestSetBitIndex(t: Int): Int = if (t < 0) 31 else t.iLog2()
+	override fun lowestSetBitIndex(t: Int): Int = t.countTrailingZeroBits() - 1
 }
 
 object IntNumScope: BaseIntNumScope(), Integral.Scope<Int>, Serializable {
@@ -90,7 +101,7 @@ object IntExactNumScope: BaseIntNumScope(), ExactIntegralScope<Int>, Serializabl
 	override fun multiplyOrNull(a: Int, b: Int): Int? = com.github.fsbarata.numeric.multiplyOrNull(a, b)
 }
 
-abstract class BaseLongNumScope: Integral.Scope<Long>, Serializable {
+abstract class BaseLongNumScope: Integral.Scope<Long>, Bitwise.Scope<Long>, Serializable {
 	override val ZERO: Long = 0
 	override val ONE: Long = 1
 
@@ -123,6 +134,15 @@ abstract class BaseLongNumScope: Integral.Scope<Long>, Serializable {
 	override fun toBigInt(a: Long): BigInt = BigInt.fromLong(a)
 
 	override fun toInt(a: Long): Int = a.toInt()
+
+	override fun not(t: Long): Long = t.inv()
+	override infix fun Long.and(other: Long): Long = and(other)
+	override infix fun Long.or(other: Long): Long = or(other)
+	override infix fun Long.xor(other: Long): Long = xor(other)
+	override infix fun Long.shl(bitCount: Int): Long = shl(bitCount)
+	override infix fun Long.shr(bitCount: Int): Long = shr(bitCount)
+	override fun highestSetBitIndex(t: Long): Int = if (t < 0) 63 else t.iLog2()
+	override fun lowestSetBitIndex(t: Long): Int = t.countTrailingZeroBits() - 1
 }
 
 object LongNumScope: BaseLongNumScope(), Integral.Scope<Long>, Serializable {
