@@ -1,8 +1,0 @@
-apply plugin: 'kotlin'
-apply plugin: "idea"
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    testImplementation "junit:junit:4.13.1"
-}
-

@@ -19,27 +19,22 @@ buildscript {
 allprojects {
     repositories {
         mavenCentral()
+    }
+}
+
+subprojects {
+    repositories {
         maven { url "https://jitpack.io" }
     }
 
     group = "com.github.fsbarata.kotlin-numeric"
-}
+    version = "local"
 
-subprojects {
     afterEvaluate {
         if (plugins.hasPlugin("maven-publish")) {
-            if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
-                publishing.publications {
-                    maven(MavenPublication) {
-                        from(components.kotlin)
-                    }
-                }
-            }
-            if (plugins.hasPlugin("java")) {
-                publishing.publications {
-                    maven(MavenPublication) {
-                        from(components.java)
-                    }
+            publishing.publications {
+                maven(MavenPublication) {
+                    from(components.kotlin)
                 }
             }
         }
@@ -47,13 +42,6 @@ subprojects {
         tasks.withType(KotlinCompile.class).configureEach {
             kotlinOptions {
                 jvmTarget = JavaVersion.VERSION_1_9.toString()
-            }
-        }
-
-        if (plugins.hasPlugin("java")) {
-            java {
-                sourceCompatibility = JavaVersion.VERSION_1_9
-                targetCompatibility = JavaVersion.VERSION_1_9
             }
         }
     }
