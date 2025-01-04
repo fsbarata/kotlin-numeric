@@ -1,5 +1,8 @@
 package com.github.fsbarata.numeric
 
+import kotlin.math.ceil
+import kotlin.math.sqrt
+
 inline fun <A> Integral.Scope<A>.divideInt(dividend: A, divisor: Int, roundingType: RoundingType): A =
 	divide(dividend, fromInt(divisor), roundingType)
 
@@ -101,3 +104,28 @@ inline fun <A, R> Integral.Scope<R>.averageOfOrNull(array: Array<A>, roundingTyp
 
 inline fun <A> Integral.Scope<A>.averageOrNull(iterable: Iterable<A>, roundingType: RoundingType): A? =
 	averageOfOrNull(iterable, roundingType) { it }
+
+inline fun <A, I> I.isqrt(a: A): A where I: Bitwise.Scope<A>, I: Integral.Scope<A> {
+	require(!isNegative(a))
+	if (isZero(a)) return ZERO
+
+	val highestSetBitIndex = highestSetBitIndex(a)
+	val shiftsEven = when {
+		highestSetBitIndex < 63 -> 0
+		highestSetBitIndex.and(1) == 1 -> highestSetBitIndex - 61
+		else -> highestSetBitIndex - 62
+	}
+
+	val long = toLong(if (highestSetBitIndex < 64) a else a.shr(shiftsEven))
+	if (long <= 3) return ONE
+
+	val estimateLong = ceil(sqrt(long.toDouble())).toLong()
+
+	var xi = fromLong(estimateLong).shl(shiftsEven.shr(1))
+	while (true) {
+		// Newton's algorithm
+		val xj = (xi + a / xi).shr(1)
+		if (xj >= xi) return xi
+		xi = xj
+	}
+}
