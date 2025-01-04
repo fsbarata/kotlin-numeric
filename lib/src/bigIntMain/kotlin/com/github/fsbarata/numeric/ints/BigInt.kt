@@ -86,6 +86,14 @@ actual class BigInt: Integral<BigInt>, Bitwise<BigInt>, Serializable {
 	actual override fun shl(bitCount: Int): BigInt = BigInt(shiftLeftLE(intArray, bitCount))
 	actual override fun shr(bitCount: Int): BigInt = BigInt(shiftRightLE(intArray, bitCount))
 
+	actual override fun highestSetBitIndex(): Int = when (signum()) {
+		-1 -> intArray.lastIndex * 32 + 31
+		0 -> 0
+		else -> iLog2()
+	}
+
+	actual override fun lowestSetBitIndex(): Int = trailingZeroBits(intArray) - 1
+
 	fun iLog2(): Int = iLog2(intArray)
 
 	override fun equals(other: Any?): Boolean {
@@ -294,6 +302,7 @@ actual class BigInt: Integral<BigInt>, Bitwise<BigInt>, Serializable {
 
 	actual companion object:
 		Integral.Scope<BigInt>, ExactIntegralScope<BigInt>,
+		Bitwise.Scope<BigInt> by Bitwise.delegateScope(),
 		Integral.OpScope<BigInt> by Integral.delegateOpScope() {
 		actual override val ZERO: BigInt = BigInt(zero())
 		actual override val ONE: BigInt = fromInt(1)

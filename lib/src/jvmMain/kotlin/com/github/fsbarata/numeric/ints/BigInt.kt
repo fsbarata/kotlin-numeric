@@ -1,11 +1,11 @@
 package com.github.fsbarata.numeric.ints
 
+import com.github.fsbarata.io.Serializable
 import com.github.fsbarata.numeric.BigIntegerNumScope
 import com.github.fsbarata.numeric.Bitwise
 import com.github.fsbarata.numeric.ExactIntegralScope
 import com.github.fsbarata.numeric.Integral
 import com.github.fsbarata.numeric.ratio.Rational
-import com.github.fsbarata.io.Serializable
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -44,9 +44,17 @@ actual class BigInt(val bigInteger: BigInteger): Integral<BigInt>, Bitwise<BigIn
 	actual override fun shl(bitCount: Int): BigInt = BigInt(bigInteger.shiftLeft(bitCount))
 	actual override fun shr(bitCount: Int): BigInt = BigInt(bigInteger.shiftRight(bitCount))
 
+	actual override fun highestSetBitIndex(): Int = when {
+		isZero() -> 0
+		isNegative() -> bigInteger.bitLength()
+		else -> bigInteger.bitLength() - 1
+	}
+
+	actual override fun lowestSetBitIndex(): Int = bigInteger.getLowestSetBit()
+
 
 	fun iLog2(): Int {
-		return if (signum() <= 0) throw ArithmeticException("Cannot compute iLog2 of negative number")
+		return if (!isPositive()) throw ArithmeticException("Cannot compute iLog2 of negative number")
 		else bigInteger.bitLength() - 1
 	}
 
@@ -136,11 +144,12 @@ actual class BigInt(val bigInteger: BigInteger): Integral<BigInt>, Bitwise<BigIn
 
 	actual companion object:
 		Integral.Scope<BigInt>, ExactIntegralScope<BigInt>,
+		Bitwise.Scope<BigInt> by Bitwise.delegateScope(),
 		Integral.OpScope<BigInt> by Integral.delegateOpScope(),
 		Serializable {
 		actual override val ZERO = BigInt(BigInteger.ZERO)
 		actual override val ONE = BigInt(BigInteger.ONE)
-		actual val TWO = BigInt(BigInteger.TWO)
+		actual val TWO = BigInt(BigInteger.valueOf(2))
 		actual val TEN = BigInt(BigInteger.TEN)
 
 		actual override fun compare(a: BigInt, b: BigInt): Int = a.compareTo(b)

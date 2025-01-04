@@ -1,8 +1,8 @@
 package com.github.fsbarata.numeric.ints
 
+import com.github.fsbarata.io.Serializable
 import com.github.fsbarata.numeric.*
 import com.github.fsbarata.numeric.ratio.Rational
-import com.github.fsbarata.io.Serializable
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
@@ -95,6 +95,16 @@ data class Int128(val low: Long, val high: Long): Integral<Int128>, Bitwise<Int1
 		val r = sqrUnsignedFull(low)
 		val h = this.low * high
 		return Int128(r.low, r.high + h + h)
+	}
+
+	override fun highestSetBitIndex(): Int = when {
+		high >= 0L -> iLog2()
+		else -> SIZE_BITS - 1
+	}
+
+	override fun lowestSetBitIndex(): Int = when {
+		low < 0 -> high.countTrailingZeroBits() + 64
+		else -> low.countTrailingZeroBits()
 	}
 
 	fun iLog2(): Int {
@@ -317,6 +327,7 @@ data class Int128(val low: Long, val high: Long): Integral<Int128>, Bitwise<Int1
 	)
 
 	companion object: Integral.Scope<Int128>,
+		Bitwise.Scope<Int128> by Bitwise.delegateScope(),
 		Integral.OpScope<Int128> by Integral.delegateOpScope() {
 		override val ZERO = Int128(0, 0)
 		override val ONE = Int128(1, 0)

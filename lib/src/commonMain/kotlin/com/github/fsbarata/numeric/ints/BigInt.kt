@@ -1,10 +1,10 @@
 package com.github.fsbarata.numeric.ints
 
+import com.github.fsbarata.io.Serializable
 import com.github.fsbarata.numeric.Bitwise
 import com.github.fsbarata.numeric.ExactIntegralScope
 import com.github.fsbarata.numeric.Integral
 import com.github.fsbarata.numeric.ratio.Rational
-import com.github.fsbarata.io.Serializable
 
 expect class BigInt: Integral<BigInt>, Bitwise<BigInt>, Serializable {
 	constructor(bytesBE: ByteArray, offset: Int = 0, length: Int = bytesBE.size)
@@ -33,6 +33,8 @@ expect class BigInt: Integral<BigInt>, Bitwise<BigInt>, Serializable {
 	override fun xor(other: BigInt): BigInt
 	override fun shl(bitCount: Int): BigInt
 	override fun shr(bitCount: Int): BigInt
+	override fun highestSetBitIndex(): Int
+	override fun lowestSetBitIndex(): Int
 
 	override fun signum(): Int
 	override fun unaryMinus(): BigInt
@@ -58,7 +60,7 @@ expect class BigInt: Integral<BigInt>, Bitwise<BigInt>, Serializable {
 
 	fun pow(exponent: Int): BigInt
 
-	companion object: Integral.Scope<BigInt>, ExactIntegralScope<BigInt> {
+	companion object: Integral.Scope<BigInt>, Bitwise.Scope<BigInt>, ExactIntegralScope<BigInt> {
 		override val ZERO: BigInt
 		override val ONE: BigInt
 		val TWO: BigInt
@@ -103,5 +105,25 @@ expect class BigInt: Integral<BigInt>, Bitwise<BigInt>, Serializable {
 		override fun subtractOrNull(a: BigInt, b: BigInt): BigInt?
 		override fun multiplyOrNull(a: BigInt, b: BigInt): BigInt?
 		override fun negateOrNull(a: BigInt): BigInt?
+
+		override fun not(t: BigInt): BigInt
+
+		@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+		override infix fun BigInt.and(other: BigInt): BigInt
+
+		@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+		override infix fun BigInt.or(other: BigInt): BigInt
+
+		@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+		override infix fun BigInt.xor(other: BigInt): BigInt
+
+		@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+		override infix fun BigInt.shl(bitCount: Int): BigInt
+
+		@Suppress("EXTENSION_SHADOWED_BY_MEMBER")
+		override infix fun BigInt.shr(bitCount: Int): BigInt
+
+		override fun highestSetBitIndex(t: BigInt): Int
+		override fun lowestSetBitIndex(t: BigInt): Int
 	}
 }

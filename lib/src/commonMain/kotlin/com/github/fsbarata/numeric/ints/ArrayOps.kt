@@ -489,7 +489,7 @@ internal fun iLog2(array: IntArray, lastIndex: Int = array.lastIndex): Int {
 	return array[lastIndex].iLog2() + lastIndex * 32
 }
 
-internal fun trailingBits(array: IntArray, lastIndex: Int = array.lastIndex): Int {
+internal fun trailingZeroBits(array: IntArray, lastIndex: Int = array.lastIndex): Int {
 	var trailingBits = 0
 	var index = 0
 	while (index <= lastIndex) {
@@ -638,7 +638,7 @@ internal class VarArray(
 	}
 
 	fun iLog2() = iLog2(array, lastIndex)
-	fun trailingBits() = trailingBits(array, lastIndex)
+	fun trailingBits() = trailingZeroBits(array, lastIndex)
 
 	fun compareTo(other: VarArray): Int = compareLE(array, size, other.array, other.size)
 
