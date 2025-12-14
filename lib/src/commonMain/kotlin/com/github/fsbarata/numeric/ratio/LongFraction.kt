@@ -1,11 +1,10 @@
 package com.github.fsbarata.numeric.ratio
 
+import com.github.fsbarata.io.Serializable
 import com.github.fsbarata.numeric.*
-import com.github.fsbarata.numeric.ints.BigInt
 import com.github.fsbarata.numeric.ints.Int128
 import com.github.fsbarata.numeric.ints.multiplyFull
 import com.github.fsbarata.numeric.ints.toInt128
-import com.github.fsbarata.io.Serializable
 import kotlin.jvm.JvmName
 
 class LongFraction private constructor(

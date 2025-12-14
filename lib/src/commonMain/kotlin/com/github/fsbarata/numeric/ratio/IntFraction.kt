@@ -1,8 +1,8 @@
 package com.github.fsbarata.numeric.ratio
 
+import com.github.fsbarata.io.Serializable
 import com.github.fsbarata.numeric.*
 import com.github.fsbarata.numeric.ints.toInt128
-import com.github.fsbarata.io.Serializable
 
 class IntFraction private constructor(
 	override val numerator: Int,
@@ -44,7 +44,7 @@ class IntFraction private constructor(
 	}
 
 	override fun times(n: Int, d: Int): IntFraction {
-		return LongFraction.multiply(numerator.toLong(), denominator.toLong(), n.toLong(), d.toLong())
+		return LongFraction.create(numerator.toLong() * n.toLong(), denominator.toLong() * d.toLong())
 			.reduced().toIntFractionOrThrow()
 	}
 
