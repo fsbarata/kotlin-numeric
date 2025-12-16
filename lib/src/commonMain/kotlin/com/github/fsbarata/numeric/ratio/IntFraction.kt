@@ -38,14 +38,16 @@ class IntFraction private constructor(
 		return try {
 			IntFraction.add(numerator, denominator, n, d)
 		} catch (error: ArithmeticException) {
-			LongFraction.add(numerator.toLong(), denominator.toLong(), n.toLong(), d.toLong())
-				.reduced().toIntFractionOrThrow()
+			val result = LongFraction.add(numerator.toLong(), denominator.toLong(), n.toLong(), d.toLong())
+			return result.toIntFractionOrNull()
+				?: result.reduced().toIntFractionOrThrow()
 		}
 	}
 
 	override fun times(n: Int, d: Int): IntFraction {
-		return LongFraction.create(numerator.toLong() * n.toLong(), denominator.toLong() * d.toLong())
-			.reduced().toIntFractionOrThrow()
+		val result = LongFraction.create(numerator.toLong() * n.toLong(), denominator.toLong() * d.toLong())
+		return result.toIntFractionOrNull()
+			?: result.reduced().toIntFractionOrThrow()
 	}
 
 	fun approxNumerator(denominator: Int, roundingType: RoundingType = RoundingType.TRUNCATE): Int? {
