@@ -15,7 +15,7 @@ class LongFraction private constructor(
 		require(denominator >= 0)
 	}
 
-	override val scope get() = LongExactNumScope
+	override inline val scope get() = LongExactNumScope
 
 	override fun equals(other: Any?) = other is LongFraction && equalTo(other)
 	override fun hashCode(): Int = hash()

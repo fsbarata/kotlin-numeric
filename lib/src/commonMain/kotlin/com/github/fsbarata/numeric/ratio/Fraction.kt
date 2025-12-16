@@ -80,7 +80,7 @@ abstract class Fraction<T, R: Fraction<T, R>>: FractionBase<T>(),
 		when {
 			denominator == other.denominator ->
 				if (denominator == ZERO) signum(numerator).compareTo(signum(other.numerator))
-				else numerator.compareTo(other.numerator)
+				else compare(numerator, other.numerator)
 
 			denominator == ZERO ->
 				if (signum(numerator) <= 0) -1 // this == -infinity or NaN
@@ -90,10 +90,10 @@ abstract class Fraction<T, R: Fraction<T, R>>: FractionBase<T>(),
 				if (signum(other.numerator) <= 0) 1 // other == -infinity or NaN
 				else -1 // other == +infinity
 
-			numerator == ZERO -> ZERO.compareTo(other.numerator)
-			other.numerator == ZERO -> numerator.compareTo(ZERO)
+			numerator == ZERO -> -signum(other.numerator)
+			other.numerator == ZERO -> signum(numerator)
 
-			numerator == other.numerator -> other.denominator.compareTo(denominator)
+			numerator == other.numerator -> compare(other.denominator, denominator)
 
 			else -> {
 				val on = other.numerator

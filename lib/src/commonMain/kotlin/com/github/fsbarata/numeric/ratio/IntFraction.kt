@@ -12,7 +12,7 @@ class IntFraction private constructor(
 		require(denominator >= 0)
 	}
 
-	override val scope get() = IntExactNumScope
+	override inline val scope get() = IntExactNumScope
 
 	override fun equals(other: Any?) = other is IntFraction && equalTo(other)
 	override fun hashCode(): Int = hash()
