@@ -8,11 +8,12 @@ import com.github.fsbarata.numeric.ints.Int128
 import com.github.fsbarata.numeric.ratio.Rational
 import kotlin.jvm.JvmInline
 import kotlin.math.absoluteValue
+import kotlin.math.pow
 import kotlin.math.sign
 
 
 @JvmInline
-value class IntNum(val int: Int): Integral<IntNum> {
+value class IntNum(val int: Int): Integral<IntNum>, Bitwise<IntNum> {
 	override fun toInt(): Int = int
 	override fun toIntOrNull(): Int = int
 	override fun toLong(): Long = int.toLong()
@@ -42,6 +43,50 @@ value class IntNum(val int: Int): Integral<IntNum> {
 
 	override fun signum(): Int = int.sign
 	override fun unaryMinus(): IntNum = IntNum(-int)
+
+	override fun not(): IntNum = IntNum(int.inv())
+
+	override fun and(other: IntNum): IntNum = IntNum(int.and(other.int))
+	override fun or(other: IntNum): IntNum = IntNum(int.or(other.int))
+	override fun xor(other: IntNum): IntNum = IntNum(int.xor(other.int))
+	override fun shl(bitCount: Int): IntNum = IntNum(int.shl(bitCount))
+	override fun shr(bitCount: Int): IntNum = IntNum(int.shr(bitCount))
+
+	override fun highestSetBitIndex(): Int = IntNumScope.highestSetBitIndex(int)
+	override fun lowestSetBitIndex(): Int = IntNumScope.lowestSetBitIndex(int)
+
+	abstract class Scope: Integral.Scope<IntNum>,
+		Integral.OpScope<IntNum> by Integral.delegateOpScope(),
+		Bitwise.Scope<IntNum> by Bitwise.delegateScope() {
+		override val ZERO = IntNum(0)
+		override val ONE = IntNum(1)
+
+		override fun fromInt(int: Int): IntNum = IntNum(int)
+		override fun fromLong(long: Long): IntNum = IntNum(long.toInt())
+		override fun fromLongOrNull(long: Long): IntNum? = long.toIntOrNull()?.let(::IntNum)
+		override fun fromInt128(int128: Int128): IntNum = IntNum(int128.toInt())
+		override fun fromInt128OrNull(int128: Int128): IntNum? = int128.toIntOrNull()?.let(::IntNum)
+		override fun fromBigInt(bigInt: BigInt): IntNum = IntNum(bigInt.toInt())
+		override fun fromBigIntOrNull(bigInt: BigInt): IntNum? = bigInt.toIntOrNull()?.let(::IntNum)
+
+		override fun toRational(a: IntNum): Rational = a.toRational()
+		override fun pow(base: IntNum, exp: Int): IntNum = super<Integral.Scope>.pow(base, exp)
+	}
+
+	companion object: Scope()
+
+	object ExactScope: Scope(), ExactIntegralScope<IntNum> {
+		override fun addOrNull(a: IntNum, b: IntNum): IntNum? = addOrNull(a.int, b.int)?.let(::IntNum)
+		override fun negateOrNull(a: IntNum): IntNum? = negateOrNull(a.int)?.let(::IntNum)
+		override fun multiplyOrNull(a: IntNum, b: IntNum): IntNum? = multiplyOrNull(a.int, b.int)?.let(::IntNum)
+
+		override fun add(a: IntNum, b: IntNum): IntNum = super<ExactIntegralScope>.add(a, b)
+		override fun subtract(a: IntNum, b: IntNum): IntNum = super<ExactIntegralScope>.subtract(a, b)
+		override fun multiply(a: IntNum, b: IntNum): IntNum = super<ExactIntegralScope>.multiply(a, b)
+		override fun negate(a: IntNum): IntNum = super<ExactIntegralScope>.negate(a)
+		override fun abs(a: IntNum): IntNum = super<ExactIntegralScope>.abs(a)
+		override fun sqr(a: IntNum): IntNum = super<ExactIntegralScope>.sqr(a)
+	}
 }
 
 abstract class BaseIntNumScope: Integral.Scope<Int>, Bitwise.Scope<Int> {
@@ -137,7 +182,7 @@ object IntExactNumScope: BaseIntNumScope(), ExactIntegralScope<Int>, Serializabl
 }
 
 @JvmInline
-value class LongNum(val long: Long): Integral<LongNum> {
+value class LongNum(val long: Long): Integral<LongNum>, Bitwise<LongNum> {
 	override fun toInt(): Int = long.toInt()
 	override fun toIntOrNull(): Int? = long.toIntOrNull()
 	override fun toLong(): Long = long
@@ -167,6 +212,50 @@ value class LongNum(val long: Long): Integral<LongNum> {
 
 	override fun signum(): Int = long.sign
 	override fun unaryMinus(): LongNum = LongNum(-long)
+
+	override fun not(): LongNum = LongNum(long.inv())
+
+	override fun and(other: LongNum): LongNum = LongNum(long.and(other.long))
+	override fun or(other: LongNum): LongNum = LongNum(long.or(other.long))
+	override fun xor(other: LongNum): LongNum = LongNum(long.xor(other.long))
+	override fun shl(bitCount: Int): LongNum = LongNum(long.shl(bitCount))
+	override fun shr(bitCount: Int): LongNum = LongNum(long.shr(bitCount))
+
+	override fun highestSetBitIndex(): Int = LongNumScope.highestSetBitIndex(long)
+	override fun lowestSetBitIndex(): Int = LongNumScope.lowestSetBitIndex(long)
+
+	abstract class Scope: Integral.Scope<LongNum>,
+		Integral.OpScope<LongNum> by Integral.delegateOpScope(),
+		Bitwise.Scope<LongNum> by Bitwise.delegateScope() {
+		override val ZERO = LongNum(0)
+		override val ONE = LongNum(1)
+
+		override fun fromInt(int: Int): LongNum = LongNum(int.toLong())
+		override fun fromLong(long: Long): LongNum = LongNum(long)
+		override fun fromLongOrNull(long: Long): LongNum = LongNum(long)
+		override fun fromInt128(int128: Int128): LongNum = LongNum(int128.toLong())
+		override fun fromInt128OrNull(int128: Int128): LongNum? = int128.toLongOrNull()?.let(::LongNum)
+		override fun fromBigInt(bigInt: BigInt): LongNum = LongNum(bigInt.toLong())
+		override fun fromBigIntOrNull(bigInt: BigInt): LongNum? = bigInt.toLongOrNull()?.let(::LongNum)
+
+		override fun toRational(a: LongNum): Rational = a.toRational()
+		override fun pow(base: LongNum, exp: Int): LongNum = super<Integral.Scope>.pow(base, exp)
+	}
+
+	companion object: Scope()
+
+	object ExactScope: Scope(), ExactIntegralScope<LongNum> {
+		override fun addOrNull(a: LongNum, b: LongNum): LongNum? = addOrNull(a.long, b.long)?.let(::LongNum)
+		override fun negateOrNull(a: LongNum): LongNum? = negateOrNull(a.long)?.let(::LongNum)
+		override fun multiplyOrNull(a: LongNum, b: LongNum): LongNum? = multiplyOrNull(a.long, b.long)?.let(::LongNum)
+
+		override fun add(a: LongNum, b: LongNum): LongNum = super<ExactIntegralScope>.add(a, b)
+		override fun subtract(a: LongNum, b: LongNum): LongNum = super<ExactIntegralScope>.subtract(a, b)
+		override fun multiply(a: LongNum, b: LongNum): LongNum = super<ExactIntegralScope>.multiply(a, b)
+		override fun negate(a: LongNum): LongNum = super<ExactIntegralScope>.negate(a)
+		override fun abs(a: LongNum): LongNum = super<ExactIntegralScope>.abs(a)
+		override fun sqr(a: LongNum): LongNum = super<ExactIntegralScope>.sqr(a)
+	}
 }
 
 abstract class BaseLongNumScope: Integral.Scope<Long>, Bitwise.Scope<Long>, Serializable {
@@ -256,6 +345,44 @@ value class DoubleNum(val double: Double): Fractional<DoubleNum> {
 	override fun compareTo(other: DoubleNum): Int = double.compareTo(other.double)
 	override fun signum(): Int = double.sign.toInt()
 	override fun unaryMinus(): DoubleNum = DoubleNum(-double)
+
+	companion object: Fractional.Scope<DoubleNum>,
+		Fractional.OpScope<DoubleNum> by Fractional.delegateOpScope(),
+		Floating.Scope<DoubleNum> {
+		override fun fromInt(int: Int): DoubleNum = DoubleNum(int.toDouble())
+		override fun fromLong(long: Long): DoubleNum = DoubleNum(long.toDouble())
+		override fun fromLongOrNull(long: Long): DoubleNum? = DoubleNumScope.fromLongOrNull(long)?.let(::DoubleNum)
+
+		override fun fromInt128(int128: Int128): DoubleNum = DoubleNum(int128.toDouble())
+		override fun fromInt128OrNull(int128: Int128): DoubleNum? = int128.toDoubleOrNull()?.let(::DoubleNum)
+
+		override fun fromBigInt(bigInt: BigInt): DoubleNum = DoubleNum(bigInt.toDouble())
+		override fun fromBigIntOrNull(bigInt: BigInt): DoubleNum? = bigInt.toDoubleOrNull()?.let(::DoubleNum)
+
+		override fun divideInt(a: DoubleNum, b: Int): DoubleNum = DoubleNum(a.double / b)
+
+		override fun pow(base: DoubleNum, exp: Int): DoubleNum = DoubleNum(base.double.pow(exp))
+
+		override val PI: DoubleNum = DoubleNum(kotlin.math.PI)
+		override val E: DoubleNum = DoubleNum(kotlin.math.E)
+		override fun exp(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.exp(a.double))
+		override fun ln(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.ln(a.double))
+		override fun log(a: DoubleNum, base: DoubleNum): DoubleNum = DoubleNum(kotlin.math.log(a.double, base.double))
+
+		override fun sin(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.sin(a.double))
+		override fun cos(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.cos(a.double))
+		override fun tan(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.tan(a.double))
+		override fun asin(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.asin(a.double))
+		override fun acos(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.acos(a.double))
+		override fun atan(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.atan(a.double))
+		override fun sinh(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.sinh(a.double))
+		override fun cosh(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.cosh(a.double))
+		override fun tanh(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.tanh(a.double))
+		override fun asinh(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.asinh(a.double))
+		override fun acosh(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.acosh(a.double))
+		override fun atanh(a: DoubleNum): DoubleNum = DoubleNum(kotlin.math.atanh(a.double))
+		override fun atan2(x: DoubleNum, y: DoubleNum): DoubleNum = DoubleNum(kotlin.math.atan2(x.double, y.double))
+	}
 }
 
 object DoubleNumScope: Floating.Scope<Double>, Serializable {
@@ -277,6 +404,8 @@ object DoubleNumScope: Floating.Scope<Double>, Serializable {
 
 	override fun recip(a: Double): Double = 1.0 / a
 	override fun divide(a: Double, b: Double): Double = a / b
+
+	override fun pow(base: Double, exp: Int): Double = base.pow(exp)
 
 	override fun fromInt(int: Int): Double = int.toDouble()
 	override fun fromLong(long: Long): Double = long.toDouble()
