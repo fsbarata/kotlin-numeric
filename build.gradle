@@ -38,10 +38,19 @@ subprojects {
                 }
             }
         }
-
         tasks.withType(KotlinCompile.class).configureEach {
+            compilerOptions {
+                jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_9
+            }
             kotlinOptions {
                 jvmTarget = JavaVersion.VERSION_1_9.toString()
+            }
+        }
+
+        if (plugins.hasPlugin("java")) {
+            java {
+                sourceCompatibility = JavaVersion.VERSION_1_9
+                targetCompatibility = JavaVersion.VERSION_1_9
             }
         }
     }

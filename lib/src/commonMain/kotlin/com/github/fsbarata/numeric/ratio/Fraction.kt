@@ -38,7 +38,7 @@ abstract class Fraction<T, R: Fraction<T, R>>: FractionBase<T>(),
 	protected abstract fun createUnsafe(numerator: T, denominator: T): R
 
 	private fun createSafe(numerator: T, denominator: T): R =
-		if (scope.signum(denominator) >= 0) createUnsafe(numerator, denominator)
+		if (!scope.isNegative(denominator)) createUnsafe(numerator, denominator)
 		else createUnsafe(scope.negate(numerator), scope.negate(denominator))
 
 	@Transient
@@ -65,14 +65,17 @@ abstract class Fraction<T, R: Fraction<T, R>>: FractionBase<T>(),
 		scope.isZero(denominator) -> scope.ZERO
 		numerator == denominator -> scope.ONE
 		scope.isZero(numerator) -> scope.ZERO
-		scope.signum(numerator) > 0 -> when {
+		scope.isPositive(numerator) -> when {
 			scope.compare(numerator, denominator) > 0 -> scope.divide(numerator, denominator)
 			else -> scope.divide(denominator, numerator)
 		}
 
-		else -> when (val r = scope.divide(numerator, denominator)) {
-			scope.ZERO -> scope.divide(denominator, numerator)
-			else -> r
+		else -> {
+			val r = scope.divide(numerator, denominator)
+			when {
+				scope.isZero(r) -> scope.divide(denominator, numerator)
+				else -> r
+			}
 		}
 	}.hashCode()
 
@@ -208,7 +211,7 @@ private fun <T, R> Integral.Scope<T>.reduce(numerator: T, denominator: T, create
 }
 
 abstract class FractionScope<T, R: Fraction<T, R>>(
-	val scope: Integral.Scope<T>,
+	val scope: ExactIntegralScope<T>,
 ): Fractional.Scope<R>,
 	Fractional.OpScope<R> by Fractional.delegateOpScope() {
 
@@ -241,18 +244,18 @@ abstract class FractionScope<T, R: Fraction<T, R>>(
 	override fun fromRational(rational: Rational) =
 		createUnsafe(scope.fromBigInt(rational.numerator), scope.fromBigInt(rational.denominator))
 
-	internal fun add(num1: T, den1: T, num2: T, den2: T): R = with(scope) {
+	internal fun add(num1: T, den1: T, num2: T, den2: T): R {
 		return when {
-			den1 == den2 -> createUnsafe(num2 + num1, den1)
+			den1 == den2 -> createUnsafe(scope.add(num2, num1), den1)
 			else -> create(
-				(num2 * den1) + (num1 * den2),
-				den2 * den1,
+				scope.add(scope.multiply(num2, den1), scope.multiply(num1, den2)),
+				scope.multiply(den2, den1),
 			)
 		}
 	}
 
-	internal fun multiply(num1: T, den1: T, num2: T, den2: T): R = with(scope) {
-		return create(num1 * num2, den1 * den2)
+	internal fun multiply(num1: T, den1: T, num2: T, den2: T): R {
+		return create(scope.multiply(num1, num2), scope.multiply(den1, den2))
 	}
 }
 

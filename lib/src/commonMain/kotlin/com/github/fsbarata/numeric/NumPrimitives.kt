@@ -61,6 +61,10 @@ value class IntNum(val int: Int): Integral<IntNum>, Bitwise<IntNum> {
 		override val ZERO = IntNum(0)
 		override val ONE = IntNum(1)
 
+		override fun isZero(a: IntNum): Boolean = a.int == 0
+		override fun isPositive(a: IntNum): Boolean = a.int > 0
+		override fun isNegative(a: IntNum): Boolean = a.int < 0
+
 		override fun fromInt(int: Int): IntNum = IntNum(int)
 		override fun fromLong(long: Long): IntNum = IntNum(long.toInt())
 		override fun fromLongOrNull(long: Long): IntNum? = long.toIntOrNull()?.let(::IntNum)
@@ -229,6 +233,10 @@ value class LongNum(val long: Long): Integral<LongNum>, Bitwise<LongNum> {
 		Bitwise.Scope<LongNum> by Bitwise.delegateScope() {
 		override val ZERO = LongNum(0)
 		override val ONE = LongNum(1)
+
+		override fun isZero(a: LongNum): Boolean = a.long == 0L
+		override fun isPositive(a: LongNum): Boolean = a.long > 0L
+		override fun isNegative(a: LongNum): Boolean = a.long < 0L
 
 		override fun fromInt(int: Int): LongNum = LongNum(int.toLong())
 		override fun fromLong(long: Long): LongNum = LongNum(long)
