@@ -1,14 +1,14 @@
 package com.github.fsbarata.numeric.ratio
 
+import com.github.fsbarata.io.Serializable
 import com.github.fsbarata.numeric.*
 import com.github.fsbarata.numeric.ints.BigInt
 import com.github.fsbarata.numeric.ints.Int128
-import com.github.fsbarata.io.Serializable
 import kotlin.jvm.JvmName
 import kotlin.jvm.Transient
 
 abstract class FractionBase<T>: Ratio<T> {
-	protected abstract val scope: Integral.Scope<T>
+	protected abstract val scope: ExactIntegralScope<T>
 
 	fun isNaN(): Boolean = scope.isZero(numerator) && scope.isZero(denominator)
 	fun isInfinity(): Boolean = scope.isNotZero(numerator) && scope.isZero(denominator)
@@ -62,9 +62,9 @@ abstract class Fraction<T, R: Fraction<T, R>>: FractionBase<T>(),
 	}
 
 	fun hash(): Int = when {
-		denominator == scope.ZERO -> scope.ZERO
+		scope.isZero(denominator) -> scope.ZERO
 		numerator == denominator -> scope.ONE
-		numerator == scope.ZERO -> scope.ZERO
+		scope.isZero(numerator) -> scope.ZERO
 		scope.signum(numerator) > 0 -> when {
 			scope.compare(numerator, denominator) > 0 -> scope.divide(numerator, denominator)
 			else -> scope.divide(denominator, numerator)
@@ -79,19 +79,19 @@ abstract class Fraction<T, R: Fraction<T, R>>: FractionBase<T>(),
 	override fun compareTo(other: R): Int = with(scope) {
 		when {
 			denominator == other.denominator ->
-				if (denominator == ZERO) signum(numerator).compareTo(signum(other.numerator))
+				if (isZero(denominator)) signum(numerator).compareTo(signum(other.numerator))
 				else compare(numerator, other.numerator)
 
-			denominator == ZERO ->
-				if (signum(numerator) <= 0) -1 // this == -infinity or NaN
-				else 1 // this == +infinity
+			isZero(denominator) ->
+				if (isPositive(numerator)) 1 // this == +infinity
+				else -1 // this == -infinity or NaN
 
-			other.denominator == ZERO ->
-				if (signum(other.numerator) <= 0) 1 // other == -infinity or NaN
-				else -1 // other == +infinity
+			isZero(other.denominator) ->
+				if (isPositive(other.numerator)) -1 // other == +infinity
+				else 1 // other == -infinity or NaN
 
-			numerator == ZERO -> -signum(other.numerator)
-			other.numerator == ZERO -> signum(numerator)
+			isZero(numerator) -> -signum(other.numerator)
+			isZero(other.numerator) -> signum(numerator)
 
 			numerator == other.numerator -> compare(other.denominator, denominator)
 
@@ -196,8 +196,8 @@ abstract class Fraction<T, R: Fraction<T, R>>: FractionBase<T>(),
 
 private fun <T, R> Integral.Scope<T>.reduce(numerator: T, denominator: T, create: (T, T) -> R): R {
 	if (
-		denominator == ONE || denominator == ZERO || denominator == -ONE ||
-		numerator == ONE || numerator == ZERO || numerator == -ONE
+		denominator == ONE || isZero(denominator) || denominator == -ONE ||
+		numerator == ONE || isZero(numerator) || numerator == -ONE
 	) return create(numerator, denominator)
 
 	val gcd = greatestCommonDenominator(numerator, denominator)
@@ -218,8 +218,9 @@ abstract class FractionScope<T, R: Fraction<T, R>>(
 	internal fun createUnsafeInternal(numerator: T, denominator: T) = createUnsafe(numerator, denominator)
 
 	fun create(numerator: T, denominator: T): R =
-		if (scope.signum(denominator) >= 0) createUnsafe(numerator, denominator)
-		else createUnsafe(scope.negate(numerator), scope.negate(denominator))
+		if (scope.isNegative(denominator))
+			createUnsafe(scope.negate(numerator), scope.negate(denominator))
+		else createUnsafe(numerator, denominator)
 
 	fun createReduced(numerator: T, denominator: T): R {
 		return scope.reduce(numerator, denominator, ::create)
