@@ -89,7 +89,7 @@ object BigDecimalNumScope: Fractional.Scope<BigDecimal>, Serializable {
 	override fun fromInt128OrNull(int128: Int128): BigDecimal? = fromBigIntOrNull(int128.toBigInt())
 
 	override fun fromBigInt(bigInt: BigInt): BigDecimal = bigInt.bigInteger.toBigDecimal()
-	override fun fromBigIntOrNull(bigInt: BigInt): BigDecimal? = fromBigInt(bigInt)
+	override fun fromBigIntOrNull(bigInt: BigInt): BigDecimal = fromBigInt(bigInt)
 
 	override fun toDouble(a: BigDecimal): Double = a.toDouble()
 

@@ -2,12 +2,47 @@
 
 package com.github.fsbarata.numeric
 
+import com.github.fsbarata.io.Serializable
 import com.github.fsbarata.numeric.ints.BigInt
 import com.github.fsbarata.numeric.ints.Int128
 import com.github.fsbarata.numeric.ratio.Rational
-import com.github.fsbarata.io.Serializable
+import kotlin.jvm.JvmInline
 import kotlin.math.absoluteValue
 import kotlin.math.sign
+
+
+@JvmInline
+value class IntNum(val int: Int): Integral<IntNum> {
+	override fun toInt(): Int = int
+	override fun toIntOrNull(): Int = int
+	override fun toLong(): Long = int.toLong()
+	override fun toLongOrNull(): Long = toLong()
+	override fun toInt128(): Int128 = Int128.fromInt(int)
+	override fun toInt128OrNull(): Int128 = toInt128()
+	override fun toBigInt(): BigInt = BigInt.fromInt(int)
+
+	override fun div(divisor: IntNum): IntNum = IntNum(int / divisor.int)
+	override fun rem(divisor: IntNum): IntNum = IntNum(int % divisor.int)
+
+	override fun div(divisor: Int): IntNum = IntNum(int / divisor)
+	override fun rem(divisor: Int): Int = int % divisor
+
+	override fun toRational(): Rational = Rational.fromInt(int)
+	override fun toDouble(): Double = int.toDouble()
+
+	override fun plus(addend: Int): IntNum = IntNum(int + addend)
+	override fun minus(sub: Int): IntNum = IntNum(int - sub)
+	override fun times(multiplier: Int) = IntNum(int * multiplier)
+
+	override fun plus(addend: IntNum): IntNum = IntNum(int + addend.int)
+	override fun minus(sub: IntNum): IntNum = IntNum(int - sub.int)
+	override fun times(multiplier: IntNum): IntNum = IntNum(int * multiplier.int)
+
+	override fun compareTo(other: IntNum): Int = int.compareTo(other.int)
+
+	override fun signum(): Int = int.sign
+	override fun unaryMinus(): IntNum = IntNum(-int)
+}
 
 abstract class BaseIntNumScope: Integral.Scope<Int>, Bitwise.Scope<Int> {
 	override val ZERO: Int = 0
@@ -101,6 +136,39 @@ object IntExactNumScope: BaseIntNumScope(), ExactIntegralScope<Int>, Serializabl
 	override fun multiplyOrNull(a: Int, b: Int): Int? = com.github.fsbarata.numeric.multiplyOrNull(a, b)
 }
 
+@JvmInline
+value class LongNum(val long: Long): Integral<LongNum> {
+	override fun toInt(): Int = long.toInt()
+	override fun toIntOrNull(): Int? = long.toIntOrNull()
+	override fun toLong(): Long = long
+	override fun toLongOrNull(): Long = long
+	override fun toInt128(): Int128 = Int128.fromLong(long)
+	override fun toInt128OrNull(): Int128 = toInt128()
+	override fun toBigInt(): BigInt = BigInt.fromLong(long)
+
+	override fun div(divisor: LongNum): LongNum = LongNum(long / divisor.long)
+	override fun rem(divisor: LongNum): LongNum = LongNum(long % divisor.long)
+
+	override fun div(divisor: Int): LongNum = LongNum(long / divisor)
+	override fun rem(divisor: Int): Int = (long % divisor).toInt()
+
+	override fun toRational(): Rational = Rational.fromLong(long)
+	override fun toDouble(): Double = long.toDouble()
+
+	override fun plus(addend: Int): LongNum = LongNum(long + addend)
+	override fun minus(sub: Int): LongNum = LongNum(long - sub)
+	override fun times(multiplier: Int) = LongNum(long * multiplier)
+
+	override fun plus(addend: LongNum): LongNum = LongNum(long + addend.long)
+	override fun minus(sub: LongNum): LongNum = LongNum(long - sub.long)
+	override fun times(multiplier: LongNum): LongNum = LongNum(long * multiplier.long)
+
+	override fun compareTo(other: LongNum): Int = long.compareTo(other.long)
+
+	override fun signum(): Int = long.sign
+	override fun unaryMinus(): LongNum = LongNum(-long)
+}
+
 abstract class BaseLongNumScope: Integral.Scope<Long>, Bitwise.Scope<Long>, Serializable {
 	override val ZERO: Long = 0
 	override val ONE: Long = 1
@@ -164,6 +232,30 @@ object LongExactNumScope: BaseLongNumScope(), ExactIntegralScope<Long>, Serializ
 	override fun addOrNull(a: Long, b: Long): Long? = com.github.fsbarata.numeric.addOrNull(a, b)
 	override fun negateOrNull(a: Long): Long? = com.github.fsbarata.numeric.negateOrNull(a)
 	override fun multiplyOrNull(a: Long, b: Long): Long? = com.github.fsbarata.numeric.multiplyOrNull(a, b)
+}
+
+@JvmInline
+value class DoubleNum(val double: Double): Fractional<DoubleNum> {
+	override fun div(divisor: DoubleNum): DoubleNum = DoubleNum(double / divisor.double)
+	override fun recip(): DoubleNum = DoubleNum(1.0 / double)
+
+	override fun div(divisor: Int): DoubleNum = DoubleNum(double / divisor)
+
+	override fun toRational(): Rational = DoubleNumScope.toRational(double)
+
+	override fun toDouble(): Double = double
+
+	override fun plus(addend: Int): DoubleNum = DoubleNum(double + addend)
+	override fun minus(sub: Int): DoubleNum = DoubleNum(double - sub)
+	override fun times(multiplier: Int): DoubleNum = DoubleNum(double * multiplier)
+
+	override fun plus(addend: DoubleNum): DoubleNum = DoubleNum(double + addend.double)
+	override fun minus(sub: DoubleNum): DoubleNum = DoubleNum(double - sub.double)
+	override fun times(multiplier: DoubleNum): DoubleNum = DoubleNum(double * multiplier.double)
+
+	override fun compareTo(other: DoubleNum): Int = double.compareTo(other.double)
+	override fun signum(): Int = double.sign.toInt()
+	override fun unaryMinus(): DoubleNum = DoubleNum(-double)
 }
 
 object DoubleNumScope: Floating.Scope<Double>, Serializable {
