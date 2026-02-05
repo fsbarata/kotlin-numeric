@@ -13,7 +13,7 @@ kotlin {
 	sourceSets {
 		commonMain {
 			dependencies {
-				implementation(project(":lib"))
+				implementation(project(":numbers"))
 				implementation(kotlin("test"))
 			}
 		}

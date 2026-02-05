@@ -15,7 +15,7 @@ kotlin {
 	sourceSets {
 		commonMain {
 			dependencies {
-				api(project(":lib"))
+				api(project(":numbers"))
 				api("com.github.fsbarata.kotlin-functional:base:$kotlinfVersion")
 			}
 		}
