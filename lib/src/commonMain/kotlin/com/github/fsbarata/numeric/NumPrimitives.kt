@@ -22,22 +22,20 @@ value class IntNum(val int: Int): Integral<IntNum>, Bitwise<IntNum> {
 	override fun toInt128OrNull(): Int128 = toInt128()
 	override fun toBigInt(): BigInt = BigInt.fromInt(int)
 
-	override fun div(divisor: IntNum): IntNum = IntNum(int / divisor.int)
-	override fun rem(divisor: IntNum): IntNum = IntNum(int % divisor.int)
-
-	override fun div(divisor: Int): IntNum = IntNum(int / divisor)
-	override fun rem(divisor: Int): Int = int % divisor
-
 	override fun toRational(): Rational = Rational.fromInt(int)
 	override fun toDouble(): Double = int.toDouble()
 
-	override fun plus(addend: Int): IntNum = IntNum(int + addend)
-	override fun minus(sub: Int): IntNum = IntNum(int - sub)
-	override fun times(multiplier: Int) = IntNum(int * multiplier)
+	override operator fun plus(addend: IntNum): IntNum = IntNum(int + addend.int)
+	override operator fun minus(sub: IntNum): IntNum = IntNum(int - sub.int)
+	override operator fun times(multiplier: IntNum): IntNum = IntNum(int * multiplier.int)
+	override operator fun div(divisor: IntNum): IntNum = IntNum(int / divisor.int)
+	override operator fun rem(divisor: IntNum): IntNum = IntNum(int % divisor.int)
 
-	override fun plus(addend: IntNum): IntNum = IntNum(int + addend.int)
-	override fun minus(sub: IntNum): IntNum = IntNum(int - sub.int)
-	override fun times(multiplier: IntNum): IntNum = IntNum(int * multiplier.int)
+	override operator fun plus(addend: Int): IntNum = IntNum(int + addend)
+	override operator fun minus(sub: Int): IntNum = IntNum(int - sub)
+	override operator fun times(multiplier: Int) = IntNum(int * multiplier)
+	override operator fun div(divisor: Int): IntNum = IntNum(int / divisor)
+	override operator fun rem(divisor: Int): Int = int % divisor
 
 	override fun compareTo(other: IntNum): Int = int.compareTo(other.int)
 
@@ -197,22 +195,26 @@ value class LongNum(val long: Long): Integral<LongNum>, Bitwise<LongNum> {
 	override fun toInt128OrNull(): Int128 = toInt128()
 	override fun toBigInt(): BigInt = BigInt.fromLong(long)
 
-	override fun div(divisor: LongNum): LongNum = LongNum(long / divisor.long)
-	override fun rem(divisor: LongNum): LongNum = LongNum(long % divisor.long)
-
-	override fun div(divisor: Int): LongNum = LongNum(long / divisor)
-	override fun rem(divisor: Int): Int = (long % divisor).toInt()
-
 	override fun toRational(): Rational = Rational.fromLong(long)
 	override fun toDouble(): Double = long.toDouble()
 
-	override fun plus(addend: Int): LongNum = LongNum(long + addend)
-	override fun minus(sub: Int): LongNum = LongNum(long - sub)
-	override fun times(multiplier: Int) = LongNum(long * multiplier)
+	override operator fun plus(addend: LongNum): LongNum = LongNum(long + addend.long)
+	override operator fun minus(sub: LongNum): LongNum = LongNum(long - sub.long)
+	override operator fun times(multiplier: LongNum): LongNum = LongNum(long * multiplier.long)
+	override operator fun div(divisor: LongNum): LongNum = LongNum(long / divisor.long)
+	override operator fun rem(divisor: LongNum): LongNum = LongNum(long % divisor.long)
 
-	override fun plus(addend: LongNum): LongNum = LongNum(long + addend.long)
-	override fun minus(sub: LongNum): LongNum = LongNum(long - sub.long)
-	override fun times(multiplier: LongNum): LongNum = LongNum(long * multiplier.long)
+	override operator fun plus(addend: Int): LongNum = LongNum(long + addend)
+	override operator fun minus(sub: Int): LongNum = LongNum(long - sub)
+	override operator fun times(multiplier: Int) = LongNum(long * multiplier)
+	override operator fun div(divisor: Int): LongNum = LongNum(long / divisor)
+	override operator fun rem(divisor: Int): Int = (long % divisor).toInt()
+
+	operator fun plus(addend: Long): LongNum = LongNum(long + addend)
+	operator fun minus(sub: Long): LongNum = LongNum(long - sub)
+	operator fun times(multiplier: Long) = LongNum(long * multiplier)
+	operator fun div(divisor: Long): LongNum = LongNum(long / divisor)
+	operator fun rem(divisor: Long): Long = long % divisor
 
 	override fun compareTo(other: LongNum): Int = long.compareTo(other.long)
 
@@ -337,22 +339,26 @@ object LongExactNumScope: BaseLongNumScope(), ExactIntegralScope<Long>, Serializ
 
 @JvmInline
 value class DoubleNum(val double: Double): Fractional<DoubleNum> {
-	override fun div(divisor: DoubleNum): DoubleNum = DoubleNum(double / divisor.double)
 	override fun recip(): DoubleNum = DoubleNum(1.0 / double)
-
-	override fun div(divisor: Int): DoubleNum = DoubleNum(double / divisor)
 
 	override fun toRational(): Rational = DoubleNumScope.toRational(double)
 
 	override fun toDouble(): Double = double
 
-	override fun plus(addend: Int): DoubleNum = DoubleNum(double + addend)
-	override fun minus(sub: Int): DoubleNum = DoubleNum(double - sub)
-	override fun times(multiplier: Int): DoubleNum = DoubleNum(double * multiplier)
+	override operator fun plus(addend: DoubleNum): DoubleNum = DoubleNum(double + addend.double)
+	override operator fun minus(sub: DoubleNum): DoubleNum = DoubleNum(double - sub.double)
+	override operator fun times(multiplier: DoubleNum): DoubleNum = DoubleNum(double * multiplier.double)
+	override operator fun div(divisor: DoubleNum): DoubleNum = DoubleNum(double / divisor.double)
 
-	override fun plus(addend: DoubleNum): DoubleNum = DoubleNum(double + addend.double)
-	override fun minus(sub: DoubleNum): DoubleNum = DoubleNum(double - sub.double)
-	override fun times(multiplier: DoubleNum): DoubleNum = DoubleNum(double * multiplier.double)
+	operator fun plus(addend: Double): DoubleNum = DoubleNum(double + addend)
+	operator fun minus(sub: Double): DoubleNum = DoubleNum(double - sub)
+	operator fun times(multiplier: Double): DoubleNum = DoubleNum(double * multiplier)
+	operator fun div(divisor: Double): DoubleNum = DoubleNum(double / divisor)
+
+	override operator fun plus(addend: Int): DoubleNum = DoubleNum(double + addend)
+	override operator fun minus(sub: Int): DoubleNum = DoubleNum(double - sub)
+	override operator fun times(multiplier: Int): DoubleNum = DoubleNum(double * multiplier)
+	override operator fun div(divisor: Int): DoubleNum = DoubleNum(double / divisor)
 
 	override fun compareTo(other: DoubleNum): Int = double.compareTo(other.double)
 	override fun signum(): Int = double.sign.toInt()
