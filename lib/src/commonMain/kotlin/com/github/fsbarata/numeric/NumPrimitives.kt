@@ -55,6 +55,8 @@ value class IntNum(val int: Int): Integral<IntNum>, Bitwise<IntNum> {
 	override fun highestSetBitIndex(): Int = IntNumScope.highestSetBitIndex(int)
 	override fun lowestSetBitIndex(): Int = IntNumScope.lowestSetBitIndex(int)
 
+	override fun toString(): String = int.toString()
+
 	abstract class Scope: Integral.Scope<IntNum>,
 		Integral.OpScope<IntNum> by Integral.delegateOpScope(),
 		Bitwise.Scope<IntNum> by Bitwise.delegateScope() {
@@ -228,6 +230,8 @@ value class LongNum(val long: Long): Integral<LongNum>, Bitwise<LongNum> {
 	override fun highestSetBitIndex(): Int = LongNumScope.highestSetBitIndex(long)
 	override fun lowestSetBitIndex(): Int = LongNumScope.lowestSetBitIndex(long)
 
+	override fun toString(): String = long.toString()
+
 	abstract class Scope: Integral.Scope<LongNum>,
 		Integral.OpScope<LongNum> by Integral.delegateOpScope(),
 		Bitwise.Scope<LongNum> by Bitwise.delegateScope() {
@@ -353,6 +357,8 @@ value class DoubleNum(val double: Double): Fractional<DoubleNum> {
 	override fun compareTo(other: DoubleNum): Int = double.compareTo(other.double)
 	override fun signum(): Int = double.sign.toInt()
 	override fun unaryMinus(): DoubleNum = DoubleNum(-double)
+
+	override fun toString(): String = double.toString()
 
 	companion object: Fractional.Scope<DoubleNum>,
 		Fractional.OpScope<DoubleNum> by Fractional.delegateOpScope(),
